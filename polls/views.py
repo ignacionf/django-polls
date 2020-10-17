@@ -17,7 +17,7 @@ class IndexView(generic.ListView):
         published in the future).
         """
         search = self.request.GET.get("q", None)
-        print(search)
+
         qs = Question.objects.filter(
             pub_date__lte=timezone.now()
         )
