@@ -1,0 +1,4 @@
+{{ object }}
+{% for choice in object.choice_set.all %}
+{{ choice.choice_text }}
+{% endfor %}
