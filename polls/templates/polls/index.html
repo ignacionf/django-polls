@@ -2,6 +2,10 @@
 
 <link rel="stylesheet" type="text/css" href="{% static 'polls/style.css' %}">
 
+<form action="{% url "polls:index" %}">
+    Search: <input type="text" name="q" />
+</form>
+
 {% if latest_question_list %}
     <ul>
     {% for question in latest_question_list %}
