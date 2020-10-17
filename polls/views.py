@@ -5,7 +5,12 @@ from django.utils import timezone
 from django.views import generic
 
 from .models import Choice, Question
+from .documents import QuestionDocument
 
+from elasticsearch import Elasticsearch
+from elasticsearch_dsl import Search
+
+client = Elasticsearch()
 
 class IndexView(generic.ListView):
     template_name = 'polls/index.html'
@@ -16,16 +21,16 @@ class IndexView(generic.ListView):
         Return the last five published questions (not including those set to be
         published in the future).
         """
-        search = self.request.GET.get("q", None)
-        print(search)
-        qs = Question.objects.filter(
-            pub_date__lte=timezone.now()
-        )
+        q = self.request.GET.get("q", None)
 
-        if search:
-            qs = qs.filter(question_text__icontains=search)
+        s = QuestionDocument.search()
 
-        return qs.order_by('-pub_date')[:5]
+        if q:
+            s = s.query("match", text=q)
+
+        qs = s.execute()
+
+        return qs
 
 
 class DetailView(generic.DetailView):
