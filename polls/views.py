@@ -7,10 +7,8 @@ from django.views import generic
 from .models import Choice, Question
 from .documents import QuestionDocument
 
-from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search
 
-client = Elasticsearch()
 
 class IndexView(generic.ListView):
     template_name = 'polls/index.html'
