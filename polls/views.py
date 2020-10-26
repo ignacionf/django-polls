@@ -1,4 +1,4 @@
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils import timezone
@@ -8,6 +8,8 @@ from .models import Choice, Question
 from .documents import QuestionDocument
 
 from elasticsearch_dsl import Search
+
+import json
 
 
 class IndexView(generic.ListView):
@@ -29,6 +31,21 @@ class IndexView(generic.ListView):
         qs = s.execute()
 
         return qs
+
+def autocomplete(request):
+
+    term = request.GET.get("term", None)
+    options = {'term': term, 'options': []}
+
+    if term:
+        s = QuestionDocument.search()
+        s = s.suggest("autocomplete", text=term, completion={"field": "suggest", "size": 20})
+        data = s.execute().suggest.to_dict()
+
+        for i in data['autocomplete'][0]['options']:
+            options['options'].append(i['_source']['question_text'])
+
+    return JsonResponse(options)
 
 
 class DetailView(generic.DetailView):
